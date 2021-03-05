@@ -36,18 +36,15 @@ def parse_requirements(*names):
     return requirements
 
 
-# Edit this part to match your module.
-# Full sample:
-#   https://forge.softwareheritage.org/diffusion/DCORE/browse/master/setup.py
 setup(
-    name="swh.<module-name>",  # example: swh.loader.pypi
-    description="Software Heritage <Module's intent>",
+    name="swh.counters",
+    description="Software Heritage Next gen counters",
     long_description=long_description,
     long_description_content_type="text/markdown",
     python_requires=">=3.7",
     author="Software Heritage developers",
     author_email="swh-devel@inria.fr",
-    url="https://forge.softwareheritage.org/diffusion/<module-git-code>",
+    url="https://forge.softwareheritage.org/source/swh-counters",
     packages=find_packages(),  # packages's modules
     install_requires=parse_requirements(None, "swh"),
     tests_require=parse_requirements("test"),
@@ -55,10 +52,10 @@ setup(
     use_scm_version=True,
     extras_require={"testing": parse_requirements("test")},
     include_package_data=True,
-    entry_points="""
-        [swh.cli.subcommands]
-        <cli-name>=swh.<module>.cli
-    """,
+    # entry_points="""
+    #     [swh.cli.subcommands]
+    #     <cli-name>=swh.<module>.cli
+    # """,
     classifiers=[
         "Programming Language :: Python :: 3",
         "Intended Audience :: Developers",
@@ -69,7 +66,7 @@ setup(
     project_urls={
         "Bug Reports": "https://forge.softwareheritage.org/maniphest",
         "Funding": "https://www.softwareheritage.org/donate",
-        "Source": "https://forge.softwareheritage.org/source/swh-<module>",
-        "Documentation": "https://docs.softwareheritage.org/devel/swh-<module>/",
+        "Source": "https://forge.softwareheritage.org/source/swh-counters",
+        "Documentation": "https://docs.softwareheritage.org/devel/swh-counters/",
     },
 )

@@ -1,5 +1,4 @@
-swh-py-template
+swh-counters
 ===============
 
-Python module template, used as skeleton to create new modules.
-
+Next generation counters for swh objects
