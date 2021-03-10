@@ -3,7 +3,9 @@
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
 
-from pkgutil import extend_path
-from typing import Iterable
+from typing import Any, Dict, Iterable
 
-__path__: Iterable[str] = extend_path(__path__, __name__)
+
+def process_journal_messages(messages: Dict[str, Iterable[Any]], *, counters):
+    """Worker function for `JournalClient.process(worker_fn)`"""
+    pass

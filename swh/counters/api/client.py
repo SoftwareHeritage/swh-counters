@@ -3,7 +3,12 @@
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
 
-from pkgutil import extend_path
-from typing import Iterable
+from swh.core.api import RPCClient
 
-__path__: Iterable[str] = extend_path(__path__, __name__)
+from ..interface import CountersInterface
+
+
+class RemoteCounters(RPCClient):
+    """Proxy to a remote counters API"""
+
+    backend_class = CountersInterface
