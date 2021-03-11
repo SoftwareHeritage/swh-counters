@@ -5,7 +5,13 @@
 
 from typing import Any, Dict, Iterable
 
+from swh.counters.redis import Redis
 
-def process_journal_messages(messages: Dict[str, Iterable[Any]], *, counters):
+
+def process_journal_messages(
+    messages: Dict[str, Iterable[Any]], *, counters: Redis
+) -> None:
     """Worker function for `JournalClient.process(worker_fn)`"""
-    pass
+
+    for key in messages.keys():
+        counters.add(key, messages[key])

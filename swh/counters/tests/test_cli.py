@@ -17,8 +17,7 @@ from swh.journal.serializers import value_to_kafka
 CLI_CONFIG = """
 counters:
     cls: redis
-    host:
-    - %(redis_host)s
+    host: %(redis_host)s
 """
 
 JOURNAL_OBJECTS_CONFIG_TEMPLATE = """
