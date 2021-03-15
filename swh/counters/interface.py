@@ -22,7 +22,7 @@ class CountersInterface:
         """
         ...
 
-    @remote_api_endpoint("get_count")
+    @remote_api_endpoint("count")
     def get_count(self, collection: str) -> int:
         """Return the number of keys for the provided collection"""
         ...
