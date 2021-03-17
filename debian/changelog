@@ -1,3 +1,9 @@
+swh.counters (0.1.0-1+swh2) unstable-swh; urgency=medium
+
+  * Rebuild to unstuck the debian packaging.
+
+ -- Vincent Sellier <vincent.sellier@softwareheritage.org>  Wed, 17 Mar 2021 17:20:49 +0100
+
 swh.counters (0.1.0-1+swh1) unstable-swh; urgency=medium
 
   * Initial release.
