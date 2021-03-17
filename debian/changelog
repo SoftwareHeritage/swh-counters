@@ -1,0 +1,5 @@
+swh.counters (0.1.0-1+swh1) unstable-swh; urgency=medium
+
+  * Initial release.
+
+ -- Vincent Sellier <vincent.sellier@softwareheritage.org>  Wed, 17 Mar 2021 17:20:49 +0100
