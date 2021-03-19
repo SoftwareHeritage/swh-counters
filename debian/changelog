@@ -1,8 +1,8 @@
-swh.counters (0.1.0-1+swh2~bpo10+1) buster-swh; urgency=medium
+swh.counters (0.1.0-1+swh3) unstable-swh; urgency=medium
 
-  * Rebuild for buster-swh
+  * Rebuild to remove the swh/__init__.py file from the package
 
- -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Wed, 17 Mar 2021 17:13:37 +0000
+ -- Vincent SELLIER <vsellier@swh-vs1>  Fri, 19 Mar 2021 17:25:15 +0100
 
 swh.counters (0.1.0-1+swh2) unstable-swh; urgency=medium
 
