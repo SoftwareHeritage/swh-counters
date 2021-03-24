@@ -55,3 +55,6 @@ class Redis:
 
     def get_count(self, collection: str) -> int:
         return self.redis_client.pfcount(collection)
+
+    def get_counters(self) -> Iterable[str]:
+        return self.redis_client.keys()

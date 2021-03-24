@@ -29,7 +29,10 @@ def make_app(config: Dict[str, Any]) -> RPCServerApp:
     handler = logging.StreamHandler()
     app.logger.addHandler(handler)
 
+    app.config["counters"] = get_counters(**config["counters"])
+
     app.add_url_rule("/", "index", index)
+    app.add_url_rule("/metrics", "metrics", get_metrics)
 
     return app
 
@@ -84,3 +87,32 @@ def make_app_from_configfile():
         app = make_app(api_cfg)
 
     return app
+
+
+def get_metrics():
+    """expose the counters values in a prometheus format
+
+        detailed format:
+        # HELP swh_archive_object_total Software Heritage Archive object counters
+        # TYPE swh_archive_object_total gauge
+        swh_archive_object_total{col="value",object_type="<collection>"} <value>
+        ...
+    """
+
+    response = [
+        "# HELP swh_archive_object_total Software Heritage Archive object counters",
+        "# TYPE swh_archive_object_total gauge",
+    ]
+    counters = app.config["counters"]
+
+    for collection in counters.get_counters():
+        collection_name = collection.decode("utf-8")
+        value = counters.get_count(collection)
+        line = 'swh_archive_object_total{col="value", object_type="%s"} %s' % (
+            collection_name,
+            value,
+        )
+        response.append(line)
+    response.append("")
+
+    return "\n".join(response)
