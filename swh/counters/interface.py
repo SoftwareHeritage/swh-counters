@@ -26,3 +26,7 @@ class CountersInterface:
     def get_count(self, collection: str) -> int:
         """Return the number of keys for the provided collection"""
         ...
+
+    @remote_api_endpoint("counters")
+    def get_counters(self) -> Iterable[str]:
+        """Return the list of managed counters"""

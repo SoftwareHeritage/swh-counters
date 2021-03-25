@@ -4,11 +4,9 @@
 # See top-level LICENSE file for more information
 
 import pytest
-from pytest_redis import factories
+from redis import Redis as RedisClient
 
 from swh.counters.redis import DEFAULT_REDIS_PORT, Redis
-
-local_redis = factories.redis_proc(host="localhost")
 
 
 def test__redis__constructor():
@@ -66,3 +64,17 @@ def test__redis__collection(local_redis):
     assert 1 == r.get_count("c2")
     assert 2 == r.get_count("c3")
     assert 0 == r.get_count("c4")
+
+
+def test__redis__collections(local_redis):
+    client = RedisClient(host=local_redis.host, port=local_redis.port)
+    client.pfadd("counter1", b"k1")
+    client.pfadd("counter2", b"k2")
+
+    r = Redis("%s:%d" % (local_redis.host, local_redis.port))
+
+    counters = r.get_counters()
+
+    assert 2 == len(counters)
+    assert b"counter1" in counters
+    assert b"counter2" in counters

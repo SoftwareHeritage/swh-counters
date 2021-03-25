@@ -6,6 +6,7 @@
 import logging
 
 import pytest
+from redis import Redis as RedisClient
 
 logger = logging.getLogger(__name__)
 
@@ -24,3 +25,11 @@ def journal_config(kafka_server, kafka_prefix) -> str:
     return JOURNAL_OBJECTS_CONFIG_TEMPLATE.format(
         broker=kafka_server, group_id="test-consumer", prefix=kafka_prefix
     )
+
+
+@pytest.fixture
+def local_redis(redis_proc):
+    yield redis_proc
+    # Cleanup redis between 2 tests
+    rc = RedisClient(host=redis_proc.host, port=redis_proc.port)
+    rc.flushall()
