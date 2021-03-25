@@ -3,9 +3,11 @@
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
 
+import re
 from typing import Any, Dict
 
 import pytest
+from redis import Redis as RedisClient
 import yaml
 
 from swh.core.api import RPCServerApp
@@ -15,12 +17,12 @@ from swh.counters.api.server import load_and_check_config, make_app_from_configf
 
 def teardown_function():
     # Ensure there is no configuration loaded from a previous test
-    server.api = None
+    server.app = None
 
 
 @pytest.fixture
 def swh_counters_server_config() -> Dict[str, Any]:
-    return {"counters": {"cls": "redis", "hosts": "redis",}}
+    return {"counters": {"cls": "redis", "host": "redis",}}
 
 
 @pytest.fixture
@@ -97,3 +99,47 @@ def test_server_index(swh_counters_server_config_on_disk, mocker):
 
     assert 200 == r.status_code
     assert b"SWH Counters" in r.get_data()
+
+
+def test_server_metrics(local_redis, tmp_path, monkeypatch):
+    """Test the metrics generation"""
+
+    rc = RedisClient(host=local_redis.host, port=local_redis.port)
+    data = {
+        "col1": 1,
+        "col2": 4,
+        "col3": 6,
+        "col4": 10,
+    }
+
+    for coll in data.keys():
+        for i in range(0, data[coll]):
+            rc.pfadd(coll, i)
+
+    cfg = {
+        "counters": {"cls": "redis", "host": f"{local_redis.host}:{local_redis.port}"}
+    }
+    _environment_config_file(tmp_path, monkeypatch, cfg)
+
+    app = make_app_from_configfile()
+    app.config["TESTING"] = True
+    tc = app.test_client()
+
+    r = tc.get("/metrics")
+
+    assert 200 == r.status_code
+
+    response = r.get_data().decode("utf-8")
+
+    assert "HELP" in response
+    assert "TYPE" in response
+
+    for collection in data.keys():
+        obj_type = f'object_type="{collection}"'
+        assert obj_type in response
+
+        pattern = r'swh_archive_object_total{col="value", object_type="%s"} (\d+)' % (
+            collection
+        )
+        m = re.search(pattern, response)
+        assert data[collection] == int(m.group(1))
