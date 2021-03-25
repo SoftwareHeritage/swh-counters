@@ -1,3 +1,12 @@
+swh.counters (0.2.0-1~swh1) unstable-swh; urgency=medium
+
+  * New upstream release 0.2.0     - (tagged by Vincent SELLIER
+    <vincent.sellier@softwareheritage.org> on 2021-03-25 10:15:51 +0100)
+  * Upstream changes:     - v0.2.0     - Expose counters as prometheus
+    metrics
+
+ -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Thu, 25 Mar 2021 09:18:18 +0000
+
 swh.counters (0.1.0-1+swh3) unstable-swh; urgency=medium
 
   * Rebuild to remove the swh/__init__.py file from the package
