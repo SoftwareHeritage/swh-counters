@@ -7,8 +7,9 @@ import inspect
 
 import pytest
 
-from swh.counters import get_counters
+from swh.counters import get_counters, get_history
 from swh.counters.api.client import RemoteCounters
+from swh.counters.history import History
 from swh.counters.interface import CountersInterface
 from swh.counters.redis import Redis
 
@@ -69,3 +70,21 @@ def test_types(mocker, class_, expected_class, kwargs):
         assert expected_signature == actual_signature, meth_name
 
         assert missing_methods == []
+
+
+def test_get_history_failure():
+    with pytest.raises(ValueError, match="Unknown history class"):
+        get_history("unknown-history")
+
+
+def test_get_history():
+    concrete_history = get_history(
+        "prometheus",
+        **{
+            "prometheus_host": "",
+            "prometheus_port": "",
+            "live_data_start": "",
+            "cache_base_directory": "",
+        },
+    )
+    assert isinstance(concrete_history, History)

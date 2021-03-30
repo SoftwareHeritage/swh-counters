@@ -1,0 +1,32 @@
+{
+    "status": "success",
+    "data": {
+        "resultType": "matrix",
+        "result": [
+            {
+                "metric": {
+                    "__name__": "swh_archive_object_total",
+                    "col": "value",
+                    "environment": "production",
+                    "instance": "counters1.internal.softwareheritage.org",
+                    "job": "swh-counters",
+                    "object_type": "revision"
+                },
+                "values": [
+                    [
+                        80.1,
+                        "1"
+                    ],
+                    [
+                        90.9,
+                        "2"
+                    ],
+                    [
+                        95.1,
+                        "5"
+                    ]
+                ]
+            }
+        ]
+    }
+}

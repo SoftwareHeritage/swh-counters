@@ -8,8 +8,8 @@ from typing import Any, Dict
 
 from swh.core import config
 from swh.core.api import RPCServerApp
-from swh.counters import get_counters
-from swh.counters.interface import CountersInterface
+from swh.counters import get_counters, get_history
+from swh.counters.interface import CountersInterface, HistoryInterface
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +24,11 @@ def make_app(config: Dict[str, Any]) -> RPCServerApp:
         __name__,
         backend_class=CountersInterface,
         backend_factory=lambda: get_counters(**config["counters"]),
+    )
+
+    app.add_backend_class(
+        backend_class=HistoryInterface,
+        backend_factory=lambda: get_history(**config["history"]),
     )
 
     handler = logging.StreamHandler()
