@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: swh.counters
-Version: 0.2.0
+Version: 0.2.1
 Summary: Software Heritage Next gen counters
 Home-page: https://forge.softwareheritage.org/source/swh-counters
 Author: Software Heritage developers
@@ -10,10 +10,13 @@ Project-URL: Bug Reports, https://forge.softwareheritage.org/maniphest
 Project-URL: Funding, https://www.softwareheritage.org/donate
 Project-URL: Source, https://forge.softwareheritage.org/source/swh-counters
 Project-URL: Documentation, https://docs.softwareheritage.org/devel/swh-counters/
-Description: swh-counters
-        ===============
+Description: .. _swh-counters:
         
-        Next generation counters for swh objects
+        swh-counters
+        ============
+        
+        Service providing efficient estimates of the number of objects in the SWH archive, using
+        Redis's Hyperloglog
         
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
