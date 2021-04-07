@@ -4,7 +4,9 @@
 # See top-level LICENSE file for more information
 import logging
 import os
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+
+from flask import abort
 
 from swh.core import config
 from swh.core.api import RPCServerApp
@@ -13,7 +15,7 @@ from swh.counters.interface import CountersInterface, HistoryInterface
 
 logger = logging.getLogger(__name__)
 
-app = None
+app: Optional[RPCServerApp] = None
 
 
 def make_app(config: Dict[str, Any]) -> RPCServerApp:
@@ -26,15 +28,20 @@ def make_app(config: Dict[str, Any]) -> RPCServerApp:
         backend_factory=lambda: get_counters(**config["counters"]),
     )
 
-    app.add_backend_class(
-        backend_class=HistoryInterface,
-        backend_factory=lambda: get_history(**config["history"]),
-    )
-
     handler = logging.StreamHandler()
     app.logger.addHandler(handler)
 
     app.config["counters"] = get_counters(**config["counters"])
+
+    if "history" in config:
+        app.add_backend_class(
+            backend_class=HistoryInterface,
+            backend_factory=lambda: get_history(**config["history"]),
+        )
+        app.config["history"] = get_history(**config["history"])
+        app.add_url_rule(
+            "/counters_history/<filename>", "history", get_history_file_content
+        )
 
     app.add_url_rule("/", "index", index)
     app.add_url_rule("/metrics", "metrics", get_metrics)
@@ -121,3 +128,11 @@ def get_metrics():
     response.append("")
 
     return "\n".join(response)
+
+
+def get_history_file_content(filename: str):
+    assert app is not None
+    try:
+        return app.config["history"].get_history(filename)
+    except FileNotFoundError:
+        abort(404)

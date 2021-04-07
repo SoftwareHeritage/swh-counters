@@ -1,8 +1,12 @@
-swh.counters (0.3.0-1~swh2~bpo10+1) buster-swh; urgency=medium
+swh.counters (0.4.0-1~swh1) unstable-swh; urgency=medium
 
-  * Rebuild for buster-swh
+  * New upstream release 0.4.0     - (tagged by Vincent SELLIER
+    <vincent.sellier@softwareheritage.org> on 2021-04-07 17:09:57 +0200)
+  * Upstream changes:     - v0.4.0     - Add a GET endpoint to retrieve
+    the historical data     - Use a intermediate temporary file during
+    the generation     - of the historical data file
 
- -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Wed, 07 Apr 2021 10:41:40 +0000
+ -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Wed, 07 Apr 2021 15:14:08 +0000
 
 swh.counters (0.3.0-1~swh2) unstable-swh; urgency=medium
 

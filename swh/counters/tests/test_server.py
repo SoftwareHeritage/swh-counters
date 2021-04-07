@@ -3,6 +3,7 @@
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
 
+import json
 import re
 from typing import Any, Dict
 
@@ -30,6 +31,25 @@ def swh_counters_server_config_on_disk(
     tmp_path, monkeypatch, swh_counters_server_config
 ) -> str:
     return _environment_config_file(tmp_path, monkeypatch, swh_counters_server_config)
+
+
+@pytest.fixture
+def history_test_client(tmp_path, monkeypatch):
+    cfg = {
+        "counters": {"cls": "redis", "host": "redis:6379"},
+        "history": {
+            "cls": "prometheus",
+            "prometheus_host": "prometheus",
+            "prometheus_port": "9090",
+            "live_data_start": "0",
+            "cache_base_directory": "/tmp",
+        },
+    }
+    _environment_config_file(tmp_path, monkeypatch, cfg)
+
+    app = make_app_from_configfile()
+    app.config["TESTING"] = True
+    return app.test_client()
 
 
 def write_config_file(tmpdir, config_dict: Dict, name: str = "config.yml") -> str:
@@ -143,3 +163,31 @@ def test_server_metrics(local_redis, tmp_path, monkeypatch):
         )
         m = re.search(pattern, response)
         assert data[collection] == int(m.group(1))
+
+
+def test_server_counters_history(history_test_client, mocker):
+    """Test the counters history file download"""
+
+    expected_result = {"content": [[1, 1], [2, 2]]}
+    mock = mocker.patch("swh.counters.history.History.get_history")
+    mock.return_value = expected_result
+
+    r = history_test_client.get("/counters_history/test.json")
+
+    assert 200 == r.status_code
+
+    response = r.get_data().decode("utf-8")
+    response_json = json.loads(response)
+
+    assert response_json == expected_result
+
+
+def test_server_counters_history_file_not_found(history_test_client, mocker):
+    """ensure a 404 is returned when the file doesn't exists"""
+
+    mock = mocker.patch("swh.counters.history.History.get_history")
+    mock.side_effect = FileNotFoundError
+
+    r = history_test_client.get("/counters_history/fake.json")
+
+    assert 404 == r.status_code
