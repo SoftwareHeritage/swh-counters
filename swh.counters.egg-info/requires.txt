@@ -1,3 +1,4 @@
+Flask
 redis
 swh.core[http]>=0.3
 swh.journal
