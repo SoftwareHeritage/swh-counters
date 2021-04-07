@@ -9,11 +9,15 @@ import importlib
 from typing import TYPE_CHECKING, Any, Dict
 
 if TYPE_CHECKING:
-    from swh.counters.interface import CountersInterface
+    from swh.counters.interface import CountersInterface, HistoryInterface
 
 COUNTERS_IMPLEMENTATIONS = {
     "redis": ".redis.Redis",
     "remote": ".api.client.RemoteCounters",
+}
+
+HISTORY_IMPLEMENTATIONS = {
+    "prometheus": ".history.History",
 }
 
 
@@ -42,3 +46,30 @@ def get_counters(cls: str, **kwargs: Dict[str, Any]) -> CountersInterface:
     module = importlib.import_module(module_path, package=__package__)
     Counters = getattr(module, class_name)
     return Counters(**kwargs)
+
+
+def get_history(cls: str, **kwargs: Dict[str, Any]) -> HistoryInterface:
+    """Get a history object of class `cls` with arguments `kwargs`.
+
+    Args:
+        cls: history's class, only 'prometheus' is supported actually
+        kwargs: dictionary of arguments passed to the
+            counters class constructor
+
+    Returns:
+        an instance of swh.counters.history's classes (either local or remote)
+
+    Raises:
+        ValueError if passed an unknown history class.
+    """
+    class_path = HISTORY_IMPLEMENTATIONS.get(cls)
+    if class_path is None:
+        raise ValueError(
+            "Unknown history class `%s`. Supported: %s"
+            % (cls, ", ".join(HISTORY_IMPLEMENTATIONS))
+        )
+
+    (module_path, class_name) = class_path.rsplit(".", 1)
+    module = importlib.import_module(module_path, package=__package__)
+    History = getattr(module, class_name)
+    return History(**kwargs)
