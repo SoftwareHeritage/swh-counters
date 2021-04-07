@@ -4,6 +4,7 @@
 # See top-level LICENSE file for more information
 import json
 import logging
+import os
 import time
 from typing import Dict, List, Optional
 
@@ -118,5 +119,9 @@ class History:
             prometheus_data = self._get_timestamp_history(object=object)
             live_data[object] = static_data.get(object, []) + prometheus_data
 
-        with open(f"{self.cache_base_directory}/{cache_file}", "w") as f:
+        target_file = f"{self.cache_base_directory}/{cache_file}"
+        tmp_file = f"{target_file}.tmp"
+        with open(tmp_file, "w") as f:
             f.write(json.dumps(live_data))
+
+        os.rename(tmp_file, target_file)
