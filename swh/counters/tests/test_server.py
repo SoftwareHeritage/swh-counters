@@ -170,7 +170,7 @@ def test_server_counters_history(history_test_client, mocker):
 
     expected_result = {"content": [[1, 1], [2, 2]]}
     mock = mocker.patch("swh.counters.history.History.get_history")
-    mock.return_value = expected_result
+    mock.return_value = json.dumps(expected_result)
 
     r = history_test_client.get("/counters_history/test.json")
 
