@@ -1,8 +1,11 @@
-swh.counters (0.4.1-1~swh1~bpo10+1) buster-swh; urgency=medium
+swh.counters (0.4.2-1~swh1) unstable-swh; urgency=medium
 
-  * Rebuild for buster-swh
+  * New upstream release 0.4.2     - (tagged by Vincent SELLIER
+    <vincent.sellier@softwareheritage.org> on 2021-04-08 23:53:45 +0200)
+  * Upstream changes:     - v0.4.2     - * Let flask manage json
+    response by itself     - * Fix history endpoints path
 
- -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Thu, 08 Apr 2021 10:23:48 +0000
+ -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Thu, 08 Apr 2021 21:56:07 +0000
 
 swh.counters (0.4.1-1~swh1) unstable-swh; urgency=medium
 
