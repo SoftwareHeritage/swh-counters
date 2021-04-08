@@ -34,12 +34,12 @@ class CountersInterface:
 
 
 class HistoryInterface:
-    @remote_api_endpoint("/history")
+    @remote_api_endpoint("history")
     def get_history(self, cache_file: str):
         """Return the content of an history file previously created
            by the refresh_counters method"""
 
-    @remote_api_endpoint("/refresh_history")
+    @remote_api_endpoint("refresh_history")
     def refresh_history(self, cache_file: str):
         """Refresh the cache file containing the counters historical data.
            It can be an aggregate of live data and static data stored on
