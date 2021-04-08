@@ -6,7 +6,7 @@ import logging
 import os
 from typing import Any, Dict, Optional
 
-from flask import abort
+from flask import abort, jsonify
 
 from swh.core import config
 from swh.core.api import RPCServerApp
@@ -133,6 +133,8 @@ def get_metrics():
 def get_history_file_content(filename: str):
     assert app is not None
     try:
-        return app.config["history"].get_history(filename)
+        content = app.config["history"].get_history(filename)
     except FileNotFoundError:
         abort(404)
+
+    return jsonify(content)
