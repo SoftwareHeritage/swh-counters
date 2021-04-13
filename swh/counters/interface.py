@@ -3,7 +3,7 @@
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
 
-from typing import Any, Iterable
+from typing import Any, Dict, Iterable, List
 
 from swh.core.api import remote_api_endpoint
 
@@ -24,6 +24,11 @@ class CountersInterface:
 
     @remote_api_endpoint("count")
     def get_count(self, collection: str) -> int:
+        """Return the number of keys for the provided collection"""
+        ...
+
+    @remote_api_endpoint("counts")
+    def get_counts(self, collections: List[str]) -> Dict[str, int]:
         """Return the number of keys for the provided collection"""
         ...
 
