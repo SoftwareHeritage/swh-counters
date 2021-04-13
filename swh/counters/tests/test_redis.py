@@ -78,3 +78,21 @@ def test__redis__collections(local_redis):
     assert 2 == len(counters)
     assert b"counter1" in counters
     assert b"counter2" in counters
+
+
+def test__redis_counts(local_redis):
+    client = RedisClient(host=local_redis.host, port=local_redis.port)
+    client.pfadd("counter1", b"k1")
+    client.pfadd("counter1", b"k2")
+    client.pfadd("counter2", b"k1")
+    client.pfadd("counter2", b"k2")
+    client.pfadd("counter2", b"k3")
+    client.pfadd("counter3", b"k3")
+
+    r = Redis("%s:%d" % (local_redis.host, local_redis.port))
+
+    counts = r.get_counts(["counter2", "counter1"])
+
+    assert 2 == len(counts)
+    assert 2 == counts["counter1"]
+    assert 3 == counts["counter2"]
