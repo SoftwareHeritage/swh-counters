@@ -4,7 +4,7 @@
 # See top-level LICENSE file for more information
 
 import logging
-from typing import Any, Iterable
+from typing import Any, Dict, Iterable, List
 
 from redis.client import Redis as RedisClient
 from redis.exceptions import ConnectionError
@@ -55,6 +55,9 @@ class Redis:
 
     def get_count(self, collection: str) -> int:
         return self.redis_client.pfcount(collection)
+
+    def get_counts(self, collections: List[str]) -> Dict[str, int]:
+        return {coll: self.get_count(coll) for coll in collections}
 
     def get_counters(self) -> Iterable[str]:
         return self.redis_client.keys()
