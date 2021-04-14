@@ -1,5 +1,3 @@
-.. _swh-counters:
-
 swh-counters
 ============
 
