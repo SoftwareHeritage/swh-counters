@@ -33,6 +33,7 @@ swh.counters.egg-info/top_level.txt
 swh/counters/__init__.py
 swh/counters/cli.py
 swh/counters/history.py
+swh/counters/in_memory.py
 swh/counters/interface.py
 swh/counters/journal_client.py
 swh/counters/kafka_client.py
@@ -46,6 +47,7 @@ swh/counters/tests/conftest.py
 swh/counters/tests/test_cli.py
 swh/counters/tests/test_history.py
 swh/counters/tests/test_init.py
+swh/counters/tests/test_inmemory.py
 swh/counters/tests/test_journal_client.py
 swh/counters/tests/test_redis.py
 swh/counters/tests/test_server.py

@@ -10,12 +10,14 @@ import pytest
 from swh.counters import get_counters, get_history
 from swh.counters.api.client import RemoteCounters
 from swh.counters.history import History
+from swh.counters.in_memory import InMemory
 from swh.counters.interface import CountersInterface
 from swh.counters.redis import Redis
 
 COUNTERS_IMPLEMENTATIONS = [
     ("remote", RemoteCounters, {"url": "localhost"}),
     ("redis", Redis, {"host": "localhost"}),
+    ("memory", InMemory, {}),
 ]
 
 
