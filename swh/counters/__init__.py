@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 COUNTERS_IMPLEMENTATIONS = {
     "redis": ".redis.Redis",
     "remote": ".api.client.RemoteCounters",
+    "memory": ".in_memory.InMemory",
 }
 
 HISTORY_IMPLEMENTATIONS = {
