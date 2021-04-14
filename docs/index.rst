@@ -1,3 +1,5 @@
+.. _swh-counters:
+
 .. include:: README.rst
 
 .. toctree::
