@@ -1,3 +1,12 @@
+swh.counters (0.5.1-1~swh1) unstable-swh; urgency=medium
+
+  * New upstream release 0.5.1     - (tagged by Vincent SELLIER
+    <vincent.sellier@softwareheritage.org> on 2021-04-14 11:24:46 +0200)
+  * Upstream changes:     - v0.5.1     - Add an in_memory implmentation
+    for tests     - fix documentation
+
+ -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Wed, 14 Apr 2021 09:26:49 +0000
+
 swh.counters (0.5.0-1~swh1) unstable-swh; urgency=medium
 
   * New upstream release 0.5.0     - (tagged by Vincent SELLIER
