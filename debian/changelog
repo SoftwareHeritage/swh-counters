@@ -1,8 +1,11 @@
-swh.counters (0.5.1-1~swh1~bpo10+1) buster-swh; urgency=medium
+swh.counters (0.6.0-1~swh1) unstable-swh; urgency=medium
 
-  * Rebuild for buster-swh
+  * New upstream release 0.6.0     - (tagged by Vincent SELLIER
+    <vincent.sellier@softwareheritage.org> on 2021-04-22 16:15:13 +0200)
+  * Upstream changes:     - v0.6.0     - extract the person count from
+    releases and revisions
 
- -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Wed, 14 Apr 2021 09:27:52 +0000
+ -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Thu, 22 Apr 2021 14:17:56 +0000
 
 swh.counters (0.5.1-1~swh1) unstable-swh; urgency=medium
 
