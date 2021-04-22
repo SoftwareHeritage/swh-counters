@@ -42,10 +42,9 @@ def invoke(catch_exceptions, args, config="", *, redis_host):
 
 
 def test__journal_client__worker_function_invoked(
-    mocker, kafka_server, kafka_prefix, journal_config
+    mocker, kafka_server, kafka_prefix, journal_config, local_redis_host
 ):
-    mock = mocker.patch("swh.counters.journal_client.process_journal_messages")
-    mock.return_value = 1
+    mock = mocker.patch("swh.counters.journal_client.process_journal_messages_by_keys")
 
     producer = Producer(
         {
@@ -61,26 +60,33 @@ def test__journal_client__worker_function_invoked(
     invoke(
         False,
         # Missing --object-types (and no config key) will make the cli raise
-        ["journal-client", "--stop-after-objects", "1", "--object-type", "content"],
+        [
+            "journal-client",
+            "--stop-after-objects",
+            "1",
+            "--object-type",
+            "content",
+            "keys",
+        ],
         journal_config,
-        redis_host="localhost",
+        redis_host=local_redis_host,
     )
 
     assert mock.call_count == 1
 
 
-def test__journal_client__missing_main_journal_config_key():
+def test__journal_client__missing_main_journal_config_key(local_redis_host):
     """Missing configuration on journal should raise"""
     with pytest.raises(KeyError, match="journal"):
         invoke(
             catch_exceptions=False,
-            args=["journal-client", "--stop-after-objects", "1",],
+            args=["journal-client", "--stop-after-objects", "1", "messages"],
             config="",  # missing config will make it raise
-            redis_host=None,
+            redis_host=local_redis_host,
         )
 
 
-def test__journal_client__missing_journal_config_keys():
+def test__journal_client__missing_journal_config_keys(local_redis_host):
     """Missing configuration on mandatory journal keys should raise"""
     kafka_prefix = "swh.journal.objects"
     journal_objects_config = JOURNAL_OBJECTS_CONFIG_TEMPLATE.format(
@@ -106,13 +112,14 @@ def test__journal_client__missing_journal_config_keys():
                     kafka_prefix,
                     "--object-type",
                     "content",
+                    "keys",
                 ],
                 config=yaml_cfg,  # incomplete config will make the cli raise
-                redis_host=None,
+                redis_host=local_redis_host,
             )
 
 
-def test__journal_client__missing_prefix_config_key(kafka_server):
+def test__journal_client__missing_prefix_config_key(kafka_server, local_redis_host):
     """Missing configuration on mandatory prefix key should raise"""
 
     journal_cfg_template = """
@@ -136,13 +143,16 @@ journal:
                 "1",
                 "--object-type",
                 "content",
+                "messages",
             ],
             journal_cfg,
-            redis_host=None,
+            redis_host=local_redis_host,
         )
 
 
-def test__journal_client__missing_object_types_config_key(kafka_server):
+def test__journal_client__missing_object_types_config_key(
+    kafka_server, local_redis_host
+):
     """Missing configuration on mandatory object-types key should raise"""
 
     journal_cfg = JOURNAL_OBJECTS_CONFIG_TEMPLATE.format(
@@ -153,15 +163,23 @@ def test__journal_client__missing_object_types_config_key(kafka_server):
         invoke(
             False,
             # Missing --object-types (and no config key) will make the cli raise
-            ["journal-client", "--stop-after-objects", "1",],
+            ["journal-client", "--stop-after-objects", "1", "keys"],
             journal_cfg,
-            redis_host=None,
+            redis_host=local_redis_host,
         )
 
 
-def test__journal_client__key_received(mocker, kafka_server):
-    mock = mocker.patch("swh.counters.journal_client.process_journal_messages")
-    mock.return_value = 1
+@pytest.mark.parametrize(
+    "message_handling, worker_fn",
+    [
+        ("keys", "swh.counters.journal_client.process_journal_messages_by_keys"),
+        ("messages", "swh.counters.journal_client.process_journal_messages"),
+    ],
+)
+def test__journal_client__key_received(
+    mocker, kafka_server, local_redis_host, message_handling, worker_fn
+):
+    mock = mocker.patch(worker_fn)
 
     prefix = "swh.journal.objects"
     object_type = "content"
@@ -193,16 +211,41 @@ def test__journal_client__key_received(mocker, kafka_server):
             object_type,
             "--prefix",
             prefix,
+            message_handling,
         ],
         journal_cfg,
-        redis_host=None,
+        redis_host=local_redis_host,
     )
 
     # Check the output
     expected_output = "Processed 1 messages.\nDone.\n"
     assert result.exit_code == 0, result.output
     assert result.output == expected_output
+    assert mock.called
     assert mock.call_args[0][0]["content"]
     assert len(mock.call_args[0][0]) == 1
     assert object_type in mock.call_args[0][0].keys()
-    assert key == mock.call_args[0][0][object_type][0]
+
+
+def test__journal_client__no_journal_type_argument_should_raise(
+    kafka_server, local_redis_host
+):
+    journal_cfg = JOURNAL_OBJECTS_CONFIG_TEMPLATE.format(
+        broker=kafka_server, prefix="prefix", group_id="test-consumer"
+    )
+
+    with pytest.raises(SystemExit):
+        invoke(
+            False,
+            [
+                "journal-client",
+                "--stop-after-objects",
+                "1",
+                "--object-type",
+                "object_type",
+                "--prefix",
+                "prefix",
+            ],
+            journal_cfg,
+            redis_host=local_redis_host,
+        )

@@ -45,14 +45,26 @@ def counters_cli_group(ctx, config_file):
 @click.option(
     "--prefix", "-p", help="Topic prefix to use (e.g swh.journal.objects)",
 )
+@click.argument(
+    "journal_type", type=click.Choice(["keys", "messages"],),
+)
 @click.pass_context
-def journal_client(ctx, stop_after_objects, object_type, prefix):
+def journal_client(ctx, stop_after_objects, object_type, prefix, journal_type):
     """Listens for new messages from the SWH Journal, and count them
+        if the 'journal_type' argument is 'keys', it will only count the distinct
+        keys for each listened topic, if it's 'messages', the messages
+        are deserialized to be able to count the distinct values
+        of internal properties of the objects.
     `"""
     import functools
 
+    from swh.journal.client import get_journal_client
+
     from . import get_counters
-    from .journal_client import process_journal_messages
+    from .journal_client import (
+        process_journal_messages,
+        process_journal_messages_by_keys,
+    )
 
     config = ctx.obj["config"]
     journal_cfg = config["journal"]
@@ -69,11 +81,20 @@ def journal_client(ctx, stop_after_objects, object_type, prefix):
     if journal_cfg["prefix"] is None:
         raise ValueError("'prefix' must be specified by cli or configuration")
 
-    client = KeyOrientedJournalClient(**journal_cfg,)
-
     counters = get_counters(**config["counters"])
 
-    worker_fn = functools.partial(process_journal_messages, counters=counters,)
+    if journal_type == "keys":
+        client = KeyOrientedJournalClient(**journal_cfg,)
+        worker_fn = functools.partial(
+            process_journal_messages_by_keys, counters=counters,
+        )
+    elif journal_type == "messages":
+        client = get_journal_client(cls="kafka", **journal_cfg,)
+        worker_fn = functools.partial(process_journal_messages, counters=counters,)
+
+    assert client is not None
+    assert worker_fn is not None
+
     nb_messages = 0
     try:
         nb_messages = client.process(worker_fn)
