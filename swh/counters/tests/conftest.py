@@ -33,3 +33,8 @@ def local_redis(redis_proc):
     # Cleanup redis between 2 tests
     rc = RedisClient(host=redis_proc.host, port=redis_proc.port)
     rc.flushall()
+
+
+@pytest.fixture
+def local_redis_host(local_redis):
+    return f"{local_redis.host}:{local_redis.port}"
