@@ -4,7 +4,7 @@
 # See top-level LICENSE file for more information
 
 from collections import defaultdict
-from typing import Any, Dict, List
+from typing import Dict
 
 from confluent_kafka import KafkaError
 
@@ -12,13 +12,15 @@ from swh.journal.client import JournalClient, _error_cb
 
 
 class KeyOrientedJournalClient(JournalClient):
-    """Journal Client implementation which only uses the message keys.
-       This does not need to bother with the message deserialization (contrary
-       to `swh.journal.client.JournalClient`)
+    """Journal Client implementation which only decodes the message keys.
+    This does not need to bother with the message deserialization (contrary
+    to :class:`swh.journal.client.JournalClient`)
+    Message values are still passed unparsed to ``worker_fn`` so it can
+    deserialize and use it if needed.
     """
 
     def handle_messages(self, messages, worker_fn):
-        keys: Dict[str, List[Any]] = defaultdict(list)
+        objects: Dict[str, Dict[bytes, bytes]] = defaultdict(dict)
         nb_processed = 0
 
         for message in messages:
@@ -34,10 +36,10 @@ class KeyOrientedJournalClient(JournalClient):
                 continue
             nb_processed += 1
             object_type = message.topic().split(".")[-1]
-            keys[object_type].append(message.key())
+            objects[object_type][message.key()] = message.value()
 
-        if keys:
-            worker_fn(dict(keys))
+        if objects:
+            worker_fn(dict(objects))
             self.consumer.commit()
 
         at_eof = self.stop_on_eof and all(

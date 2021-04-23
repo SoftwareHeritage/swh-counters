@@ -5,11 +5,10 @@
 
 from typing import Dict, Optional
 
-import pytest
+import msgpack
 
 from swh.counters.journal_client import (
     process_journal_messages,
-    process_journal_messages_by_keys,
     process_releases,
     process_revisions,
 )
@@ -51,7 +50,6 @@ def _create_release(author_fullname: Optional[str]) -> Dict:
         author = Person(fullname=bytes(author_fullname, "utf-8"), name=None, email=None)
 
     release = Release(
-        id=hash_to_bytes("34973274ccef6ab4dfaaf86599792fa9c3fe4689"),
         name=b"Release",
         message=b"Message",
         target=hash_to_bytes("34973274ccef6ab4dfaaf86599792fa9c3fe4689"),
@@ -63,7 +61,7 @@ def _create_release(author_fullname: Optional[str]) -> Dict:
     return release.to_dict()
 
 
-def _create_revision(author_fullname: str, committer_fullname: str) -> Revision:
+def _create_revision(author_fullname: str, committer_fullname: str) -> Dict:
     """Use Revision.to_dict to be sure the names of the fields used to retrieve
        the author and the committer are correct"""
     revision = Revision(
@@ -83,22 +81,28 @@ def _create_revision(author_fullname: str, committer_fullname: str) -> Revision:
     return revision.to_dict()
 
 
-RELEASES = [
-    _create_release(author_fullname="author 1"),
-    _create_release(author_fullname="author 2"),
-    _create_release(author_fullname=None),
-]
+RELEASES = {
+    rel["id"]: msgpack.dumps(rel)
+    for rel in [
+        _create_release(author_fullname="author 1"),
+        _create_release(author_fullname="author 2"),
+        _create_release(author_fullname=None),
+    ]
+}
 
 
 RELEASES_AUTHOR_FULLNAMES = {b"author 1", b"author 2"}
 
 
-REVISIONS = [
-    _create_revision(author_fullname="author 1", committer_fullname="committer 1"),
-    _create_revision(author_fullname="author 2", committer_fullname="committer 2"),
-    _create_revision(author_fullname="author 2", committer_fullname="committer 1"),
-    _create_revision(author_fullname="author 1", committer_fullname="committer 2"),
-]
+REVISIONS = {
+    rev["id"]: msgpack.dumps(rev)
+    for rev in [
+        _create_revision(author_fullname="author 1", committer_fullname="committer 1"),
+        _create_revision(author_fullname="author 2", committer_fullname="committer 2"),
+        _create_revision(author_fullname="author 2", committer_fullname="committer 1"),
+        _create_revision(author_fullname="author 1", committer_fullname="committer 2"),
+    ]
+}
 
 
 REVISIONS_AUTHOR_FULLNAMES = {b"author 1", b"author 2"}
@@ -112,9 +116,12 @@ def test__journal_client__all_keys(mocker):
 
     redis = Redis(host="localhost")
 
-    keys = {"coll1": [b"key1", b"key2"], "coll2": [b"key3", b"key4", b"key5"]}
+    keys = {
+        "coll1": {b"key1": b"value1", b"key2": b"value2"},
+        "coll2": {b"key3": b"value3", b"key4": b"value4", b"key5": b"value5"},
+    }
 
-    process_journal_messages_by_keys(messages=keys, counters=redis)
+    process_journal_messages(messages=keys, counters=redis)
 
     assert mock.call_count == 2
 
@@ -127,32 +134,6 @@ def test__journal_client__all_keys(mocker):
     assert second_call_args[0][1] == keys["coll2"]
 
 
-def test__journal_client__unsupported_messages_do_nothin(mocker):
-    mocks = _get_processing_method_mocks(mocker)
-
-    messages = {"fake_type": [{"keys": "value"}]}
-
-    process_journal_messages(messages=messages, counters=None)
-
-    for mocked_method in mocks.keys():
-        assert not mocks[mocked_method].called
-
-
-@pytest.mark.parametrize("message_type", ["release", "revision"])
-def test__journal_client__right_method_per_message_type_is_called(mocker, message_type):
-    mocks = _get_processing_method_mocks(mocker)
-
-    messages = {message_type: [{"k1": "v1"}, {"k2": "v2"}]}
-
-    process_journal_messages(messages=messages, counters=None)
-
-    for mocked_method in mocks.keys():
-        if mocked_method == message_type:
-            assert mocks[mocked_method].call_count == 1
-        else:
-            assert not mocks[mocked_method].called
-
-
 def test__journal_client_process_revisions(mocker):
     mock = mocker.patch("swh.counters.redis.Redis.add")
 
@@ -163,7 +144,7 @@ def test__journal_client_process_revisions(mocker):
     assert mock.call_count == 1
     first_call_args = mock.call_args_list[0]
     assert first_call_args[0][0] == "person"
-    assert first_call_args[0][1] == list(REVISIONS_PERSON_FULLNAMES)
+    assert sorted(first_call_args[0][1]) == sorted(REVISIONS_PERSON_FULLNAMES)
 
 
 def test__journal_client_process_releases(mocker):
@@ -182,10 +163,13 @@ def test__journal_client_process_releases(mocker):
 def test__journal_client_process_releases_without_authors(mocker):
     mock = mocker.patch("swh.counters.redis.Redis.add")
 
-    releases = [
-        _create_release(author_fullname=None),
-        _create_release(author_fullname=None),
-    ]
+    releases = {
+        rel["id"]: msgpack.dumps(rel)
+        for rel in [
+            _create_release(author_fullname=None),
+            _create_release(author_fullname=None),
+        ]
+    }
 
     redis = Redis(host="localhost")
 
