@@ -3,27 +3,22 @@
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
 
-from typing import Any, Dict, Iterable
+from typing import Dict
+
+import msgpack
 
 from swh.counters.redis import Redis
 
 
-def process_journal_messages_by_keys(
-    messages: Dict[str, Iterable[Any]], *, counters: Redis
-) -> None:
-    """Count the number of different keys for a given message type"""
-
-    for key in messages.keys():
-        counters.add(key, messages[key])
-
-
 def process_journal_messages(
-    messages: Dict[str, Iterable[Any]], *, counters: Redis
+    messages: Dict[str, Dict[bytes, bytes]], *, counters: Redis
 ) -> None:
     """Count the number of different values of an object's property.
        It allow for example to count the persons inside the
        Release (authors) and Revision (authors and committers) classes
     """
+    for key in messages.keys():
+        counters.add(key, messages[key])
 
     if "revision" in messages:
         process_revisions(messages["revision"], counters)
@@ -32,22 +27,24 @@ def process_journal_messages(
         process_releases(messages["release"], counters)
 
 
-def process_revisions(revisions: Iterable[Dict], counters: Redis):
+def process_revisions(revisions: Dict[bytes, bytes], counters: Redis):
     """Count the number of different authors and committers on the
        revisions (in the person collection)"""
     persons = set()
-    for revision in revisions:
+    for revision_bytes in revisions.values():
+        revision = msgpack.loads(revision_bytes)
         persons.add(revision["author"]["fullname"])
         persons.add(revision["committer"]["fullname"])
 
     counters.add("person", list(persons))
 
 
-def process_releases(releases: Iterable[Dict], counters: Redis):
+def process_releases(releases: Dict[bytes, bytes], counters: Redis):
     """Count the number of different authors on the
        releases (in the person collection)"""
     persons = set()
-    for release in releases:
+    for release_bytes in releases.values():
+        release = msgpack.loads(release_bytes)
         author = release.get("author")
         if author and "fullname" in author:
             persons.add(author["fullname"])
