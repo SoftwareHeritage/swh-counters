@@ -44,7 +44,7 @@ def invoke(catch_exceptions, args, config="", *, redis_host):
 def test__journal_client__worker_function_invoked(
     mocker, kafka_server, kafka_prefix, journal_config, local_redis_host
 ):
-    mock = mocker.patch("swh.counters.journal_client.process_journal_messages_by_keys")
+    mock = mocker.patch("swh.counters.journal_client.process_journal_messages")
 
     producer = Producer(
         {
@@ -60,14 +60,7 @@ def test__journal_client__worker_function_invoked(
     invoke(
         False,
         # Missing --object-types (and no config key) will make the cli raise
-        [
-            "journal-client",
-            "--stop-after-objects",
-            "1",
-            "--object-type",
-            "content",
-            "keys",
-        ],
+        ["journal-client", "--stop-after-objects", "1", "--object-type", "content",],
         journal_config,
         redis_host=local_redis_host,
     )
@@ -80,7 +73,7 @@ def test__journal_client__missing_main_journal_config_key(local_redis_host):
     with pytest.raises(KeyError, match="journal"):
         invoke(
             catch_exceptions=False,
-            args=["journal-client", "--stop-after-objects", "1", "messages"],
+            args=["journal-client", "--stop-after-objects", "1"],
             config="",  # missing config will make it raise
             redis_host=local_redis_host,
         )
@@ -112,7 +105,6 @@ def test__journal_client__missing_journal_config_keys(local_redis_host):
                     kafka_prefix,
                     "--object-type",
                     "content",
-                    "keys",
                 ],
                 config=yaml_cfg,  # incomplete config will make the cli raise
                 redis_host=local_redis_host,
@@ -143,7 +135,6 @@ journal:
                 "1",
                 "--object-type",
                 "content",
-                "messages",
             ],
             journal_cfg,
             redis_host=local_redis_host,
@@ -163,23 +154,15 @@ def test__journal_client__missing_object_types_config_key(
         invoke(
             False,
             # Missing --object-types (and no config key) will make the cli raise
-            ["journal-client", "--stop-after-objects", "1", "keys"],
+            ["journal-client", "--stop-after-objects", "1"],
             journal_cfg,
             redis_host=local_redis_host,
         )
 
 
-@pytest.mark.parametrize(
-    "message_handling, worker_fn",
-    [
-        ("keys", "swh.counters.journal_client.process_journal_messages_by_keys"),
-        ("messages", "swh.counters.journal_client.process_journal_messages"),
-    ],
-)
-def test__journal_client__key_received(
-    mocker, kafka_server, local_redis_host, message_handling, worker_fn
-):
-    mock = mocker.patch(worker_fn)
+def test__journal_client__key_received(mocker, kafka_server, local_redis_host):
+    mock = mocker.patch("swh.counters.journal_client.process_journal_messages")
+    mock.return_value = 1
 
     prefix = "swh.journal.objects"
     object_type = "content"
@@ -211,7 +194,6 @@ def test__journal_client__key_received(
             object_type,
             "--prefix",
             prefix,
-            message_handling,
         ],
         journal_cfg,
         redis_host=local_redis_host,
@@ -225,27 +207,3 @@ def test__journal_client__key_received(
     assert mock.call_args[0][0]["content"]
     assert len(mock.call_args[0][0]) == 1
     assert object_type in mock.call_args[0][0].keys()
-
-
-def test__journal_client__no_journal_type_argument_should_raise(
-    kafka_server, local_redis_host
-):
-    journal_cfg = JOURNAL_OBJECTS_CONFIG_TEMPLATE.format(
-        broker=kafka_server, prefix="prefix", group_id="test-consumer"
-    )
-
-    with pytest.raises(SystemExit):
-        invoke(
-            False,
-            [
-                "journal-client",
-                "--stop-after-objects",
-                "1",
-                "--object-type",
-                "object_type",
-                "--prefix",
-                "prefix",
-            ],
-            journal_cfg,
-            redis_host=local_redis_host,
-        )
