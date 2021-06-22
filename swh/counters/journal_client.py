@@ -7,11 +7,11 @@ from typing import Dict
 
 import msgpack
 
-from swh.counters.redis import Redis
+from swh.counters.interface import CountersInterface
 
 
 def process_journal_messages(
-    messages: Dict[str, Dict[bytes, bytes]], *, counters: Redis
+    messages: Dict[str, Dict[bytes, bytes]], *, counters: CountersInterface
 ) -> None:
     """Count the number of different values of an object's property.
        It allow for example to count the persons inside the
@@ -27,7 +27,7 @@ def process_journal_messages(
         process_releases(messages["release"], counters)
 
 
-def process_revisions(revisions: Dict[bytes, bytes], counters: Redis):
+def process_revisions(revisions: Dict[bytes, bytes], counters: CountersInterface):
     """Count the number of different authors and committers on the
        revisions (in the person collection)"""
     persons = set()
@@ -39,7 +39,7 @@ def process_revisions(revisions: Dict[bytes, bytes], counters: Redis):
     counters.add("person", list(persons))
 
 
-def process_releases(releases: Dict[bytes, bytes], counters: Redis):
+def process_releases(releases: Dict[bytes, bytes], counters: CountersInterface):
     """Count the number of different authors on the
        releases (in the person collection)"""
     persons = set()
