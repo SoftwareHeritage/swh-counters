@@ -24,21 +24,9 @@ from swh.model.model import (
     TimestampWithTimezone,
 )
 
-PROCESSING_METHODS = {
-    "release": "swh.counters.journal_client.process_releases",
-    "revision": "swh.counters.journal_client.process_revisions",
-}
-
 DATE = TimestampWithTimezone(
     timestamp=Timestamp(seconds=0, microseconds=0), offset=0, negative_utc=False
 )
-
-
-def _get_processing_method_mocks(mocker):
-    return {
-        message_type: mocker.patch(PROCESSING_METHODS[message_type])
-        for message_type in PROCESSING_METHODS.keys()
-    }
 
 
 def _create_release(author_fullname: Optional[str]) -> Dict:
@@ -110,11 +98,8 @@ REVISIONS_COMMITTER_FULLNAMES = {b"committer 1", b"committer 2"}
 REVISIONS_PERSON_FULLNAMES = REVISIONS_AUTHOR_FULLNAMES | REVISIONS_COMMITTER_FULLNAMES
 
 
-def test__journal_client__all_keys(mocker):
-
-    mock = mocker.patch("swh.counters.redis.Redis.add")
-
-    redis = Redis(host="localhost")
+def test_journal_client_all_keys(local_redis_host):
+    redis = Redis(host=local_redis_host)
 
     keys = {
         "coll1": {b"key1": b"value1", b"key2": b"value2"},
@@ -123,46 +108,30 @@ def test__journal_client__all_keys(mocker):
 
     process_journal_messages(messages=keys, counters=redis)
 
-    assert mock.call_count == 2
-
-    first_call_args = mock.call_args_list[0]
-    assert first_call_args[0][0] == "coll1"
-    assert first_call_args[0][1] == keys["coll1"]
-
-    second_call_args = mock.call_args_list[1]
-    assert second_call_args[0][0] == "coll2"
-    assert second_call_args[0][1] == keys["coll2"]
+    assert redis.get_counts(redis.get_counters()) == {b"coll1": 2, b"coll2": 3}
 
 
-def test__journal_client_process_revisions(mocker):
-    mock = mocker.patch("swh.counters.redis.Redis.add")
-
-    redis = Redis(host="localhost")
+def test_journal_client_process_revisions(local_redis_host):
+    redis = Redis(host=local_redis_host)
 
     process_revisions(REVISIONS, redis)
 
-    assert mock.call_count == 1
-    first_call_args = mock.call_args_list[0]
-    assert first_call_args[0][0] == "person"
-    assert sorted(first_call_args[0][1]) == sorted(REVISIONS_PERSON_FULLNAMES)
+    assert redis.get_counts(redis.get_counters()) == {
+        b"person": len(REVISIONS_PERSON_FULLNAMES)
+    }
 
 
-def test__journal_client_process_releases(mocker):
-    mock = mocker.patch("swh.counters.redis.Redis.add")
-
-    redis = Redis(host="localhost")
+def test_journal_client_process_releases(local_redis_host):
+    redis = Redis(host=local_redis_host)
 
     process_releases(RELEASES, redis)
 
-    assert mock.call_count == 1
-    first_call_args = mock.call_args_list[0]
-    assert first_call_args[0][0] == "person"
-    assert first_call_args[0][1] == list(RELEASES_AUTHOR_FULLNAMES)
+    assert redis.get_counts(redis.get_counters()) == {
+        b"person": len(RELEASES_AUTHOR_FULLNAMES)
+    }
 
 
-def test__journal_client_process_releases_without_authors(mocker):
-    mock = mocker.patch("swh.counters.redis.Redis.add")
-
+def test_journal_client_process_releases_without_authors(local_redis_host):
     releases = {
         rel["id"]: msgpack.dumps(rel)
         for rel in [
@@ -171,11 +140,8 @@ def test__journal_client_process_releases_without_authors(mocker):
         ]
     }
 
-    redis = Redis(host="localhost")
+    redis = Redis(host=local_redis_host)
 
     process_releases(releases, redis)
 
-    assert mock.called == 1
-    first_call_args = mock.call_args_list[0]
-    assert first_call_args[0][0] == "person"
-    assert first_call_args[0][1] == []
+    assert redis.get_counts(redis.get_counters()) == {}
