@@ -3,19 +3,26 @@
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
 
+from collections import Counter
 from typing import Dict, Optional
+from urllib.parse import urlparse
 
+from hypothesis import given
+from hypothesis.strategies import lists
 import msgpack
 
 from swh.counters.journal_client import (
     process_journal_messages,
+    process_origins,
     process_releases,
     process_revisions,
 )
 from swh.counters.redis import Redis
 from swh.model.hashutil import hash_to_bytes
+from swh.model.hypothesis_strategies import origins
 from swh.model.model import (
     ObjectType,
+    Origin,
     Person,
     Release,
     Revision,
@@ -145,3 +152,50 @@ def test_journal_client_process_releases_without_authors(local_redis_host):
     process_releases(releases, redis)
 
     assert redis.get_counts(redis.get_counters()) == {}
+
+
+def test_journal_client_process_origins(local_redis_host, redisdb):
+    # hypothesis does not play well with pytest function scoped fixtures
+    # so we use an inner test function as workaround
+    @given(lists(origins()))
+    def inner(origins):
+        origins_ = {
+            msgpack.dumps(origin.to_dict()): msgpack.dumps(origin.to_dict())
+            for origin in origins
+        }
+
+        # explicitly flush redis db content due to hypothesis use
+        redisdb.flushall()
+        redis = Redis(host=local_redis_host)
+
+        process_origins(origins_, redis)
+
+        expected_counts = Counter(
+            [
+                f"origin_netloc:{urlparse(origin.url).netloc}".encode()
+                for origin in set(origins)
+            ]
+        )
+
+        assert redis.get_counts(redis.get_counters()) == expected_counts
+
+    inner()
+
+
+def test_journal_client_process_googlecode_origins(local_redis_host):
+    origins = [
+        Origin(url="https://foo.googlecode.com"),
+        Origin(url="https://bar.googlecode.com"),
+    ]
+    origins_ = {
+        msgpack.dumps(origin.to_dict()): msgpack.dumps(origin.to_dict())
+        for origin in origins
+    }
+
+    redis = Redis(host=local_redis_host)
+
+    process_origins(origins_, redis)
+
+    assert redis.get_counts(redis.get_counters()) == {
+        b"origin_netloc:googlecode.com": 2
+    }
