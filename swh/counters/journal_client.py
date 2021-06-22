@@ -3,15 +3,17 @@
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
 
+from collections import defaultdict
 from typing import Dict
+from urllib.parse import urlparse
 
 import msgpack
 
-from swh.counters.redis import Redis
+from swh.counters.interface import CountersInterface
 
 
 def process_journal_messages(
-    messages: Dict[str, Dict[bytes, bytes]], *, counters: Redis
+    messages: Dict[str, Dict[bytes, bytes]], *, counters: CountersInterface
 ) -> None:
     """Count the number of different values of an object's property.
        It allow for example to count the persons inside the
@@ -20,6 +22,9 @@ def process_journal_messages(
     for key in messages.keys():
         counters.add(key, messages[key])
 
+    if "origin" in messages:
+        process_origins(messages["origin"], counters)
+
     if "revision" in messages:
         process_revisions(messages["revision"], counters)
 
@@ -27,7 +32,24 @@ def process_journal_messages(
         process_releases(messages["release"], counters)
 
 
-def process_revisions(revisions: Dict[bytes, bytes], counters: Redis):
+def process_origins(origins: Dict[bytes, bytes], counters: CountersInterface):
+    """Count the number of different network locations in origin URLs."""
+    origins_netloc = defaultdict(set)
+    for origin_bytes in origins.values():
+        origin = msgpack.loads(origin_bytes)
+        parsed_url = urlparse(origin["url"])
+        netloc = parsed_url.netloc
+        if netloc.endswith("googlecode.com"):
+            # special case for googlecode origins where URL netloc
+            # has the form {account}.googlecode.com
+            netloc = "googlecode.com"
+        origins_netloc[f"origin_netloc:{netloc}"].add(origin["url"])
+
+    for k, v in origins_netloc.items():
+        counters.add(k, v)
+
+
+def process_revisions(revisions: Dict[bytes, bytes], counters: CountersInterface):
     """Count the number of different authors and committers on the
        revisions (in the person collection)"""
     persons = set()
@@ -39,7 +61,7 @@ def process_revisions(revisions: Dict[bytes, bytes], counters: Redis):
     counters.add("person", list(persons))
 
 
-def process_releases(releases: Dict[bytes, bytes], counters: Redis):
+def process_releases(releases: Dict[bytes, bytes], counters: CountersInterface):
     """Count the number of different authors on the
        releases (in the person collection)"""
     persons = set()
