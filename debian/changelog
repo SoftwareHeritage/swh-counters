@@ -1,8 +1,10 @@
-swh.counters (0.7.0-1~swh1~bpo10+1) buster-swh; urgency=medium
+swh.counters (0.8.0-1~swh1) unstable-swh; urgency=medium
 
-  * Rebuild for buster-swh
+  * New upstream release 0.8.0     - (tagged by Antoine Lambert
+    <anlambert@softwareheritage.org> on 2021-06-22 17:34:45 +0200)
+  * Upstream changes:     - version 0.8.0
 
- -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Fri, 23 Apr 2021 08:25:48 +0000
+ -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Tue, 22 Jun 2021 15:41:57 +0000
 
 swh.counters (0.7.0-1~swh1) unstable-swh; urgency=medium
 

@@ -5,6 +5,7 @@ Priority: optional
 Build-Depends: debhelper (>= 9),
                dh-python (>= 2),
                python3-all,
+               python3-hypothesis,
                python3-pytest,
                python3-pytest-mock,
                python3-pytest-redis,
