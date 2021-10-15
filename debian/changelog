@@ -1,3 +1,12 @@
+swh.counters (0.9.0-1~swh1) unstable-swh; urgency=medium
+
+  * New upstream release 0.9.0     - (tagged by Vincent SELLIER
+    <vincent.sellier@softwareheritage.org> on 2021-10-15 10:58:44 +0200)
+  * Upstream changes:     - v0.9.0     - * T3659 Remove unused origin
+    location count
+
+ -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Fri, 15 Oct 2021 09:02:28 +0000
+
 swh.counters (0.8.0-1~swh1) unstable-swh; urgency=medium
 
   * New upstream release 0.8.0     - (tagged by Antoine Lambert
