@@ -11,4 +11,3 @@ build/
 dist/
 version.txt
 .mypy_cache/
-.hypothesis
