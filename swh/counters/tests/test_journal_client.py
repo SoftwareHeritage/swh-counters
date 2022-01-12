@@ -3,6 +3,7 @@
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
 
+import datetime
 from typing import Dict, Optional
 
 import msgpack
@@ -20,12 +21,11 @@ from swh.model.model import (
     Release,
     Revision,
     RevisionType,
-    Timestamp,
     TimestampWithTimezone,
 )
 
-DATE = TimestampWithTimezone(
-    timestamp=Timestamp(seconds=0, microseconds=0), offset=0, negative_utc=False
+DATE = TimestampWithTimezone.from_datetime(
+    datetime.datetime(2022, 1, 11, 0, 0, 0, tzinfo=datetime.timezone.utc)
 )
 
 
