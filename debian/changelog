@@ -1,8 +1,11 @@
-swh.counters (0.9.0-1~swh1~bpo10+1) buster-swh; urgency=medium
+swh.counters (0.9.1-1~swh1) unstable-swh; urgency=medium
 
-  * Rebuild for buster-swh
+  * New upstream release 0.9.1     - (tagged by Valentin Lorentz
+    <vlorentz@softwareheritage.org> on 2022-01-12 13:54:27 +0100)
+  * Upstream changes:     - v0.9.1     - * tests: Use
+    TimestampWithTimezone.from_datetime() instead of the constructor
 
- -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Fri, 15 Oct 2021 09:04:22 +0000
+ -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Wed, 12 Jan 2022 12:57:05 +0000
 
 swh.counters (0.9.0-1~swh1) unstable-swh; urgency=medium
 
