@@ -15,7 +15,10 @@ from swh.counters.kafka_client import KeyOrientedJournalClient
     "--config-file",
     "-C",
     default=None,
-    type=click.Path(exists=True, dir_okay=False,),
+    type=click.Path(
+        exists=True,
+        dir_okay=False,
+    ),
     help="Configuration file.",
 )
 @click.pass_context
@@ -43,12 +46,13 @@ def counters_cli_group(ctx, config_file):
     help="Default list of object types to subscribe to",
 )
 @click.option(
-    "--prefix", "-p", help="Topic prefix to use (e.g swh.journal.objects)",
+    "--prefix",
+    "-p",
+    help="Topic prefix to use (e.g swh.journal.objects)",
 )
 @click.pass_context
 def journal_client(ctx, stop_after_objects, object_type, prefix):
-    """Listens for new messages from the SWH Journal, and count them
-    """
+    """Listens for new messages from the SWH Journal, and count them"""
     import functools
 
     from . import get_counters

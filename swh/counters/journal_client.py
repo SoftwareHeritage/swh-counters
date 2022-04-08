@@ -14,8 +14,8 @@ def process_journal_messages(
     messages: Dict[str, Dict[bytes, bytes]], *, counters: CountersInterface
 ) -> None:
     """Count the number of different values of an object's property.
-       It allow for example to count the persons inside the
-       Release (authors) and Revision (authors and committers) classes
+    It allow for example to count the persons inside the
+    Release (authors) and Revision (authors and committers) classes
     """
     for key in messages.keys():
         counters.add(key, messages[key])
@@ -29,7 +29,7 @@ def process_journal_messages(
 
 def process_revisions(revisions: Dict[bytes, bytes], counters: CountersInterface):
     """Count the number of different authors and committers on the
-       revisions (in the person collection)"""
+    revisions (in the person collection)"""
     persons = set()
     for revision_bytes in revisions.values():
         revision = msgpack.loads(revision_bytes)
@@ -41,7 +41,7 @@ def process_revisions(revisions: Dict[bytes, bytes], counters: CountersInterface
 
 def process_releases(releases: Dict[bytes, bytes], counters: CountersInterface):
     """Count the number of different authors on the
-       releases (in the person collection)"""
+    releases (in the person collection)"""
     persons = set()
     for release_bytes in releases.values():
         release = msgpack.loads(release_bytes)

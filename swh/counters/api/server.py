@@ -19,9 +19,7 @@ app: Optional[RPCServerApp] = None
 
 
 def make_app(config: Dict[str, Any]) -> RPCServerApp:
-    """Initialize the remote api application.
-
-    """
+    """Initialize the remote api application."""
     app = RPCServerApp(
         __name__,
         backend_class=CountersInterface,
@@ -84,10 +82,10 @@ def load_and_check_config(config_file: str) -> Dict[str, Any]:
 
 def make_app_from_configfile():
     """Run the WSGI app from the webserver, loading the configuration from
-       a configuration file.
+    a configuration file.
 
-       SWH_CONFIG_FILENAME environment variable defines the
-       configuration path to load.
+    SWH_CONFIG_FILENAME environment variable defines the
+    configuration path to load.
 
     """
     global app
@@ -104,11 +102,11 @@ def make_app_from_configfile():
 def get_metrics():
     """expose the counters values in a prometheus format
 
-        detailed format:
-        # HELP swh_archive_object_total Software Heritage Archive object counters
-        # TYPE swh_archive_object_total gauge
-        swh_archive_object_total{col="value",object_type="<collection>"} <value>
-        ...
+    detailed format:
+    # HELP swh_archive_object_total Software Heritage Archive object counters
+    # TYPE swh_archive_object_total gauge
+    swh_archive_object_total{col="value",object_type="<collection>"} <value>
+    ...
     """
 
     response = [
