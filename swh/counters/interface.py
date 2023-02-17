@@ -5,10 +5,12 @@
 
 from typing import Any, Dict, Iterable, List
 
+from typing_extensions import Protocol
+
 from swh.core.api import remote_api_endpoint
 
 
-class CountersInterface:
+class CountersInterface(Protocol):
     @remote_api_endpoint("check")
     def check(self):
         """Dedicated method to execute some specific check per implementation."""
@@ -37,11 +39,12 @@ class CountersInterface:
         ...
 
 
-class HistoryInterface:
+class HistoryInterface(Protocol):
     @remote_api_endpoint("history")
     def get_history(self, cache_file: str):
         """Return the content of an history file previously created
         by the refresh_counters method"""
+        ...
 
     @remote_api_endpoint("refresh_history")
     def refresh_history(self, cache_file: str):
