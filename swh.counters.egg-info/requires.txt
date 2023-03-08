@@ -1,7 +1,7 @@
 Flask
 redis
 swh.core[http]>=0.3
-swh.journal
+swh.journal>=1.3
 
 [testing]
 pytest

@@ -5,20 +5,21 @@
 
 from typing import Any, Dict, Iterable, List
 
+from typing_extensions import Protocol
+
 from swh.core.api import remote_api_endpoint
 
 
-class CountersInterface:
+class CountersInterface(Protocol):
     @remote_api_endpoint("check")
     def check(self):
-        """Dedicated method to execute some specific check per implementation.
-        """
+        """Dedicated method to execute some specific check per implementation."""
         ...
 
     @remote_api_endpoint("add")
     def add(self, collection: str, keys: Iterable[Any]) -> None:
         """Add the provided keys to the collection
-           Only count new keys.
+        Only count new keys.
         """
         ...
 
@@ -38,15 +39,16 @@ class CountersInterface:
         ...
 
 
-class HistoryInterface:
+class HistoryInterface(Protocol):
     @remote_api_endpoint("history")
     def get_history(self, cache_file: str):
         """Return the content of an history file previously created
-           by the refresh_counters method"""
+        by the refresh_counters method"""
+        ...
 
     @remote_api_endpoint("refresh_history")
     def refresh_history(self, cache_file: str):
         """Refresh the cache file containing the counters historical data.
-           It can be an aggregate of live data and static data stored on
-           a separate file"""
+        It can be an aggregate of live data and static data stored on
+        a separate file"""
         ...

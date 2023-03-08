@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 class Redis:
     """Redis based implementation of the counters.
-       It uses one HyperLogLog collection per counter"""
+    It uses one HyperLogLog collection per counter"""
 
     _redis_client = None
 
