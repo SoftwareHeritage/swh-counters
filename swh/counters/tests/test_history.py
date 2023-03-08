@@ -36,7 +36,10 @@ def test_history_compute_url(history):
     end = 99
     object_type = "content"
 
-    url = history._compute_url(object=object_type, end=end,)
+    url = history._compute_url(
+        object=object_type,
+        end=end,
+    )
 
     assert url == (
         f'http://{TEST_HISTORY_CONFIG["prometheus_host"]}:'
@@ -51,7 +54,11 @@ def test_history_compute_url(history):
 
 
 @pytest.mark.parametrize(
-    "source, expected", [([1, "10"], [1000, 10.0]), ([2, "10.1"], [2000, 10.1]),]
+    "source, expected",
+    [
+        ([1, "10"], [1000, 10.0]),
+        ([2, "10.1"], [2000, 10.1]),
+    ],
 )
 def test_history__adapt_format(history, source, expected):
     result = history._adapt_format(source)
@@ -100,7 +107,10 @@ def test_history__get_timestamp_history(history, requests_mock, datadir, mocker)
         content = f.read()
 
     requests_mock.get(
-        url, [{"content": bytes(content, "utf-8"), "status_code": 200},],
+        url,
+        [
+            {"content": bytes(content, "utf-8"), "status_code": 200},
+        ],
     )
 
     result = history._get_timestamp_history(object)
@@ -119,7 +129,10 @@ def test_history__get_timestamp_history_request_failed(
     mock.return_value = end
 
     requests_mock.get(
-        url, [{"content": None, "status_code": 503},],
+        url,
+        [
+            {"content": None, "status_code": 503},
+        ],
     )
 
     result = history._get_timestamp_history(object)
@@ -136,7 +149,10 @@ def _configure_request_mock(
         with open(request_content_file, "r") as f:
             content = f.read()
         mock.get(
-            url, [{"content": bytes(content, "utf-8"), "status_code": 200},],
+            url,
+            [
+                {"content": bytes(content, "utf-8"), "status_code": 200},
+            ],
         )
 
 
@@ -144,7 +160,7 @@ def test_history__refresh_history_with_static_data(
     history, requests_mock, mocker, datadir, tmp_path
 ):
     """Test the generation of a cache file with an aggregation
-       of static data and live data from prometheus
+    of static data and live data from prometheus
     """
     objects = ["content", "revision"]
     static_file_name = "static.json"
@@ -189,7 +205,7 @@ def test_history__refresh_history_without_historical(
     history, requests_mock, mocker, datadir, tmp_path
 ):
     """Test the generation of a cache file with only
-       live data from prometheus"""
+    live data from prometheus"""
     objects = ["content", "revision"]
     cache_file = "result.json"
     end = 100

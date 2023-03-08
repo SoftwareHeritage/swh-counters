@@ -23,7 +23,12 @@ def teardown_function():
 
 @pytest.fixture
 def swh_counters_server_config() -> Dict[str, Any]:
-    return {"counters": {"cls": "redis", "host": "redis",}}
+    return {
+        "counters": {
+            "cls": "redis",
+            "host": "redis",
+        }
+    }
 
 
 @pytest.fixture

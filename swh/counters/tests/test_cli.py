@@ -60,7 +60,13 @@ def test__journal_client__worker_function_invoked(
     invoke(
         False,
         # Missing --object-types (and no config key) will make the cli raise
-        ["journal-client", "--stop-after-objects", "1", "--object-type", "content",],
+        [
+            "journal-client",
+            "--stop-after-objects",
+            "1",
+            "--object-type",
+            "content",
+        ],
         journal_config,
         redis_host=local_redis_host,
     )
@@ -169,7 +175,11 @@ def test__journal_client__key_received(mocker, kafka_server, local_redis_host):
     topic = prefix + "." + object_type
 
     producer = Producer(
-        {"bootstrap.servers": kafka_server, "client.id": "testproducer", "acks": "all",}
+        {
+            "bootstrap.servers": kafka_server,
+            "client.id": "testproducer",
+            "acks": "all",
+        }
     )
 
     value = value_to_kafka({"key": "value"})

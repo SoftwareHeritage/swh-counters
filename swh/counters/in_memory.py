@@ -9,7 +9,7 @@ from typing import Any, Dict, Iterable, List
 
 class InMemory:
     """InMemory implementation of the counters.
-       Naive implementation using a Dict[str, Set]"""
+    Naive implementation using a Dict[str, Set]"""
 
     def __init__(self):
         self.counters = defaultdict(set)
