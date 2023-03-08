@@ -8,7 +8,7 @@ from typing import Dict
 
 from confluent_kafka import KafkaError
 
-from swh.journal.client import JournalClient, _error_cb
+from swh.journal.client import EofBehavior, JournalClient, _error_cb
 
 
 class KeyOrientedJournalClient(JournalClient):
@@ -42,7 +42,7 @@ class KeyOrientedJournalClient(JournalClient):
             worker_fn(dict(objects))
             self.consumer.commit()
 
-        at_eof = self.stop_on_eof and all(
+        at_eof = self.on_eof == EofBehavior.STOP and all(
             (tp.topic, tp.partition) in self.eof_reached
             for tp in self.consumer.assignment()
         )

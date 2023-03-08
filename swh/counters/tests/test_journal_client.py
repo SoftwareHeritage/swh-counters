@@ -31,7 +31,7 @@ DATE = TimestampWithTimezone.from_datetime(
 
 def _create_release(author_fullname: Optional[str]) -> Dict:
     """Use Release.to_dict to be sure the field's name used to retrieve
-       the author is correct"""
+    the author is correct"""
 
     author = None
     if author_fullname:
@@ -51,7 +51,7 @@ def _create_release(author_fullname: Optional[str]) -> Dict:
 
 def _create_revision(author_fullname: str, committer_fullname: str) -> Dict:
     """Use Revision.to_dict to be sure the names of the fields used to retrieve
-       the author and the committer are correct"""
+    the author and the committer are correct"""
     revision = Revision(
         committer_date=DATE,
         date=None,

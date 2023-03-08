@@ -40,7 +40,11 @@ class History:
         if "/" in str(filename):
             raise ValueError("filename must not contain path information")
 
-    def _compute_url(self, object: str, end: int,) -> str:
+    def _compute_url(
+        self,
+        object: str,
+        end: int,
+    ) -> str:
         """Compute the api url to request data from, specific to a label.
 
         Args:
@@ -85,13 +89,19 @@ class History:
         counter_value = item[1]
         return [timestamp * 1000, float(counter_value)]
 
-    def _get_timestamp_history(self, object: str,) -> List:
+    def _get_timestamp_history(
+        self,
+        object: str,
+    ) -> List:
         """Return the live values of an object"""
         result = []
 
         now = int(time.time())
 
-        url = self._compute_url(object=object, end=now,)
+        url = self._compute_url(
+            object=object,
+            end=now,
+        )
         response = requests.get(url)
         if response.ok:
             data = response.json()
@@ -104,7 +114,10 @@ class History:
         return result
 
     def refresh_history(
-        self, cache_file: str, objects: List[str], static_file: Optional[str] = None,
+        self,
+        cache_file: str,
+        objects: List[str],
+        static_file: Optional[str] = None,
     ):
         self._validate_filename(cache_file)
 
