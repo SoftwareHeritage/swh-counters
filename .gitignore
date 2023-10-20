@@ -4,6 +4,7 @@
 *~
 .coverage
 .eggs/
+.hypothesis
 .mypy_cache
 .tox
 __pycache__
