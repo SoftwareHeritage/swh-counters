@@ -1,3 +1,12 @@
+swh.counters (0.10.0-1~swh1) unstable-swh; urgency=medium
+
+  * New upstream release 0.10.0     - (tagged by David Douard
+    <david.douard@sdfa3.org> on 2023-12-04 17:17:32 +0100)
+  * Upstream changes:     - v0.10.0     - Migrate to copier, PEP420 and
+    pyproject.toml based packaging.
+
+ -- Software Heritage autobuilder (on jenkins-debian1) <jenkins@jenkins-debian1.internal.softwareheritage.org>  Mon, 04 Dec 2023 16:27:40 +0000
+
 swh.counters (0.9.2-1~swh1) unstable-swh; urgency=medium
 
   * New upstream release 0.9.2     - (tagged by Antoine Lambert
