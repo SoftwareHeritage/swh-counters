@@ -1,24 +1,42 @@
 Metadata-Version: 2.1
 Name: swh.counters
-Version: 0.9.2
-Summary: Software Heritage Next gen counters
-Home-page: https://forge.softwareheritage.org/source/swh-counters
-Author: Software Heritage developers
-Author-email: swh-devel@inria.fr
-Project-URL: Bug Reports, https://forge.softwareheritage.org/maniphest
+Version: 0.10.0
+Summary: Software Heritage archive counters
+Author-email: Software Heritage developers <swh-devel@inria.fr>
+Project-URL: Homepage, https://gitlab.softwareheritage.org/swh/devel/swh-counters
+Project-URL: Bug Reports, https://gitlab.softwareheritage.org/swh/devel/swh-counters/-/issues
 Project-URL: Funding, https://www.softwareheritage.org/donate
-Project-URL: Source, https://forge.softwareheritage.org/source/swh-counters
 Project-URL: Documentation, https://docs.softwareheritage.org/devel/swh-counters/
+Project-URL: Source, https://gitlab.softwareheritage.org/swh/devel/swh-counters.git
 Classifier: Programming Language :: Python :: 3
 Classifier: Intended Audience :: Developers
 Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
 Classifier: Operating System :: OS Independent
 Classifier: Development Status :: 3 - Alpha
 Requires-Python: >=3.7
-Description-Content-Type: text/markdown
-Provides-Extra: testing
+Description-Content-Type: text/x-rst
 License-File: LICENSE
 License-File: AUTHORS
+Requires-Dist: Flask
+Requires-Dist: redis
+Requires-Dist: swh.core[http]>=0.3
+Requires-Dist: swh.journal>=1.3
+Provides-Extra: testing
+Requires-Dist: Flask; extra == "testing"
+Requires-Dist: redis; extra == "testing"
+Requires-Dist: swh.core[http]>=0.3; extra == "testing"
+Requires-Dist: swh.journal>=1.3; extra == "testing"
+Requires-Dist: pytest; extra == "testing"
+Requires-Dist: pytest-mock; extra == "testing"
+Requires-Dist: confluent-kafka; extra == "testing"
+Requires-Dist: pytest-redis; extra == "testing"
+Requires-Dist: pyyaml; extra == "testing"
+Requires-Dist: requests_mock; extra == "testing"
+Requires-Dist: swh.core[testing]; extra == "testing"
+Requires-Dist: types-flask; extra == "testing"
+Requires-Dist: types-pyyaml; extra == "testing"
+Requires-Dist: types-redis; extra == "testing"
+Requires-Dist: types-requests; extra == "testing"
 
 swh-counters
 ============
