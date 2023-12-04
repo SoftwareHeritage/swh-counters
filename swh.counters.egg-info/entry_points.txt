@@ -1,2 +1,2 @@
 [swh.cli.subcommands]
-counters = swh.counters.cli
+swh.counters = swh.counters.cli

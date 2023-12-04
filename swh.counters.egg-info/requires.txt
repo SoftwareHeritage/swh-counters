@@ -4,12 +4,17 @@ swh.core[http]>=0.3
 swh.journal>=1.3
 
 [testing]
+Flask
+redis
+swh.core[http]>=0.3
+swh.journal>=1.3
 pytest
 pytest-mock
 confluent-kafka
 pytest-redis
 pyyaml
 requests_mock
+swh.core[testing]
 types-flask
 types-pyyaml
 types-redis

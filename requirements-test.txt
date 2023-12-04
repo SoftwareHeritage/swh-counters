@@ -4,6 +4,7 @@ confluent-kafka
 pytest-redis
 pyyaml
 requests_mock
+swh.core[testing]
 
 types-flask
 types-pyyaml
