@@ -6,7 +6,6 @@ pyyaml
 requests_mock
 swh.core[testing]
 
-types-flask
 types-pyyaml
 types-redis
 types-requests
