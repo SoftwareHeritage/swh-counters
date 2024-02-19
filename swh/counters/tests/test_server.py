@@ -1,4 +1,4 @@
-# Copyright (C) 2021  The Software Heritage developers
+# Copyright (C) 2021-2024  The Software Heritage developers
 # See the AUTHORS file at the top-level directory of this distribution
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
@@ -16,7 +16,8 @@ from swh.counters.api import server
 from swh.counters.api.server import load_and_check_config, make_app_from_configfile
 
 
-def teardown_function():
+@pytest.fixture(autouse=True)
+def reset_server_app():
     # Ensure there is no configuration loaded from a previous test
     server.app = None
 
