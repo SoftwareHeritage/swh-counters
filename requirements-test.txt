@@ -1,6 +1,6 @@
-pytest
-pytest-mock
 confluent-kafka
+pytest >= 8.1
+pytest-mock
 pytest-redis
 pyyaml
 requests_mock
