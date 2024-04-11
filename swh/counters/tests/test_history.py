@@ -32,7 +32,6 @@ def history():
 
 
 def test_history_compute_url(history):
-
     end = 99
     object_type = "content"
 

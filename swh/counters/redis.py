@@ -32,7 +32,6 @@ class Redis:
 
     @property
     def redis_client(self) -> RedisClient:
-
         if self._redis_client is None:
             self._redis_client = RedisClient(host=self.host, port=self.port)
 
