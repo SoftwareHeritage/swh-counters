@@ -36,8 +36,8 @@ def test_history_compute_url(history):
     object_type = "content"
 
     expected_params = {
-        "query": f'sum({TEST_HISTORY_CONFIG["prometheus_collection"]}'
-        f'{{label1="value1",label2="value2",object_type="{object_type}"}})',
+        "query": f'sum(max by (object_type)({TEST_HISTORY_CONFIG["prometheus_collection"]}'
+        f'{{label1="value1",label2="value2",object_type="{object_type}"}}))',
         "start": f'{TEST_HISTORY_CONFIG["live_data_start"]}',
         "end": f"{end}",
         "step": f'{TEST_HISTORY_CONFIG["interval"]}',

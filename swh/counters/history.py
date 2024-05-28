@@ -64,7 +64,8 @@ class History:
         )
 
         params = {
-            "query": f"sum({self.prometheus_collection}{{{formated_labels}}})",
+            "query": f"sum(max by (object_type)"
+            f"({self.prometheus_collection}{{{formated_labels}}}))",
             "start": f"{self.live_data_start}",
             "end": f"{end}",
             "step": f"{self.interval}",
