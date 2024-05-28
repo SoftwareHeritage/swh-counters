@@ -6,7 +6,7 @@ import json
 import logging
 import os
 import time
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import requests
 
@@ -44,7 +44,7 @@ class History:
         self,
         object: str,
         end: int,
-    ) -> str:
+    ) -> Tuple[str, Dict[str, str]]:
         """Compute the api url to request data from, specific to a label.
 
         Args:
@@ -60,11 +60,17 @@ class History:
 
         url = (
             f"http://{self.prometheus_host}:{self.prometheus_port}/"
-            f"{self.query_range_uri}?query=sum({self.prometheus_collection}"
-            f"{{{formated_labels}}})&start={self.live_data_start}&end={end}&"
-            f"step={self.interval}"
+            f"{self.query_range_uri}"
         )
-        return url
+
+        params = {
+            "query": f"sum({self.prometheus_collection}{{{formated_labels}}})",
+            "start": f"{self.live_data_start}",
+            "end": f"{end}",
+            "step": f"{self.interval}",
+        }
+
+        return (url, params)
 
     def get_history(self, cache_file: str) -> Dict:
         self._validate_filename(cache_file)
@@ -98,11 +104,11 @@ class History:
 
         now = int(time.time())
 
-        url = self._compute_url(
+        (url, params) = self._compute_url(
             object=object,
             end=now,
         )
-        response = requests.get(url)
+        response = requests.get(url, params)
         if response.ok:
             data = response.json()
             # data answer format:

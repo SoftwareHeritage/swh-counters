@@ -35,7 +35,15 @@ def test_history_compute_url(history):
     end = 99
     object_type = "content"
 
-    url = history._compute_url(
+    expected_params = {
+        "query": f'sum({TEST_HISTORY_CONFIG["prometheus_collection"]}'
+        f'{{label1="value1",label2="value2",object_type="{object_type}"}})',
+        "start": f'{TEST_HISTORY_CONFIG["live_data_start"]}',
+        "end": f"{end}",
+        "step": f'{TEST_HISTORY_CONFIG["interval"]}',
+    }
+
+    (url, params) = history._compute_url(
         object=object_type,
         end=end,
     )
@@ -43,13 +51,10 @@ def test_history_compute_url(history):
     assert url == (
         f'http://{TEST_HISTORY_CONFIG["prometheus_host"]}:'
         f'{TEST_HISTORY_CONFIG["prometheus_port"]}/'
-        f'{TEST_HISTORY_CONFIG["query_range_uri"]}?'
-        f'query=sum({TEST_HISTORY_CONFIG["prometheus_collection"]}'
-        f'{{label1="value1",label2="value2",'
-        f'object_type="{object_type}"}})&'
-        f'start={TEST_HISTORY_CONFIG["live_data_start"]}&end={end}'
-        f'&step={TEST_HISTORY_CONFIG["interval"]}'
+        f'{TEST_HISTORY_CONFIG["query_range_uri"]}'
     )
+
+    assert expected_params == params
 
 
 @pytest.mark.parametrize(
@@ -96,7 +101,7 @@ def test_history_get_history_relative_path_failed(history):
 def test_history__get_timestamp_history(history, requests_mock, datadir, mocker):
     object = "content"
     end = 100
-    url = history._compute_url(object, end)
+    (url, params) = history._compute_url(object, end)
 
     mock = mocker.patch("time.time")
     mock.return_value = end
@@ -122,7 +127,7 @@ def test_history__get_timestamp_history_request_failed(
 ):
     object = "content"
     end = 100
-    url = history._compute_url(object, end)
+    (url, params) = history._compute_url(object, end)
 
     mock = mocker.patch("time.time")
     mock.return_value = end
@@ -143,12 +148,14 @@ def _configure_request_mock(
     history_object, mock, datadir, objects: List[str], end: int
 ):
     for object_type in objects:
-        url = history_object._compute_url(object_type, end)
+        (url, params) = history_object._compute_url(object_type, end)
         request_content_file = os.path.join(datadir, f"{object_type}.json")
         with open(request_content_file, "r") as f:
             content = f.read()
+        query_string = "&".join([f"{k}={v}" for (k, v) in params.items()])
+        full_url = f"{url}?{query_string}"
         mock.get(
-            url,
+            full_url,
             [
                 {"content": bytes(content, "utf-8"), "status_code": 200},
             ],
