@@ -6,6 +6,8 @@ pyyaml
 requests_mock
 swh.core[testing]
 
+msgpack-types
+types-confluent-kafka
 types-pyyaml
 types-redis
 types-requests
