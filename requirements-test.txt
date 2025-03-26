@@ -5,6 +5,7 @@ pytest-redis
 pyyaml
 requests_mock
 swh.core[testing]
+swh.journal[pytest]
 
 msgpack-types
 types-confluent-kafka
