@@ -1,12 +1,13 @@
-# Copyright (C) 2021  The Software Heritage developers
+# Copyright (C) 2021-2025  The Software Heritage developers
 # See the AUTHORS file at the top-level directory of this distribution
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
+
 import logging
 import os
 from typing import Any, Dict, Optional
 
-from flask import abort, jsonify
+from flask import Response, abort, jsonify
 
 from swh.core import config
 from swh.core.api import RPCServerApp
@@ -125,7 +126,10 @@ def get_metrics():
         response.append(line)
     response.append("")
 
-    return "\n".join(response)
+    return Response(
+        "\n".join(response),
+        headers={"Content-Type": "text/plain; version=1.0.0; charset=utf-8"},
+    )
 
 
 def get_history_file_content(filename: str):

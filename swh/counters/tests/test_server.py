@@ -1,4 +1,4 @@
-# Copyright (C) 2021-2024  The Software Heritage developers
+# Copyright (C) 2021-2025  The Software Heritage developers
 # See the AUTHORS file at the top-level directory of this distribution
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
@@ -154,6 +154,8 @@ def test_server_metrics(local_redis, tmp_path, monkeypatch):
     r = tc.get("/metrics")
 
     assert 200 == r.status_code
+
+    assert r.headers["Content-Type"] == "text/plain; version=1.0.0; charset=utf-8"
 
     response = r.get_data().decode("utf-8")
 
