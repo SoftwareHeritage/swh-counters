@@ -1,4 +1,4 @@
-# Copyright (C) 2021  The Software Heritage developers
+# Copyright (C) 2021-2026  The Software Heritage developers
 # See the AUTHORS file at the top-level directory of this distribution
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
@@ -41,10 +41,12 @@ def invoke(catch_exceptions, args, config="", *, redis_host):
     return result
 
 
-def test__journal_client__worker_function_invoked(
+def test_journal_client__worker_function_invoked(
     mocker, kafka_server, kafka_prefix, journal_config, local_redis_host
 ):
-    mock = mocker.patch("swh.counters.journal_client.process_journal_messages")
+    from swh.counters import journal_client
+
+    process_journal_messages = mocker.spy(journal_client, "process_journal_messages")
 
     producer = Producer(
         {
@@ -71,10 +73,10 @@ def test__journal_client__worker_function_invoked(
         redis_host=local_redis_host,
     )
 
-    assert mock.call_count == 1
+    assert process_journal_messages.call_count == 1
 
 
-def test__journal_client__missing_main_journal_config_key(local_redis_host):
+def test_journal_client__missing_main_journal_config_key(local_redis_host):
     """Missing configuration on journal should raise"""
     with pytest.raises(KeyError, match="journal"):
         invoke(
@@ -85,7 +87,7 @@ def test__journal_client__missing_main_journal_config_key(local_redis_host):
         )
 
 
-def test__journal_client__missing_journal_config_keys(local_redis_host):
+def test_journal_client__missing_journal_config_keys(local_redis_host):
     """Missing configuration on mandatory journal keys should raise"""
     kafka_prefix = "swh.journal.objects"
     journal_objects_config = JOURNAL_OBJECTS_CONFIG_TEMPLATE.format(
@@ -117,7 +119,7 @@ def test__journal_client__missing_journal_config_keys(local_redis_host):
             )
 
 
-def test__journal_client__missing_prefix_config_key(kafka_server, local_redis_host):
+def test_journal_client__missing_prefix_config_key(kafka_server, local_redis_host):
     """Missing configuration on mandatory prefix key should raise"""
 
     journal_cfg_template = """
@@ -147,7 +149,7 @@ journal:
         )
 
 
-def test__journal_client__missing_object_types_config_key(
+def test_journal_client__missing_object_types_config_key(
     kafka_server, local_redis_host
 ):
     """Missing configuration on mandatory object-types key should raise"""
@@ -166,9 +168,10 @@ def test__journal_client__missing_object_types_config_key(
         )
 
 
-def test__journal_client__key_received(mocker, kafka_server, local_redis_host):
-    mock = mocker.patch("swh.counters.journal_client.process_journal_messages")
-    mock.return_value = 1
+def test_journal_client__key_received(mocker, kafka_server, local_redis_host):
+    from swh.counters import journal_client
+
+    process_journal_messages = mocker.spy(journal_client, "process_journal_messages")
 
     prefix = "swh.journal.objects"
     object_type = "content"
@@ -213,7 +216,7 @@ def test__journal_client__key_received(mocker, kafka_server, local_redis_host):
     expected_output = "Processed 1 messages.\nDone.\n"
     assert result.exit_code == 0, result.output
     assert result.output == expected_output
-    assert mock.called
-    assert mock.call_args[0][0]["content"]
-    assert len(mock.call_args[0][0]) == 1
-    assert object_type in mock.call_args[0][0].keys()
+    assert process_journal_messages.called
+    assert process_journal_messages.call_args[0][0]["content"]
+    assert len(process_journal_messages.call_args[0][0]) == 1
+    assert object_type in process_journal_messages.call_args[0][0].keys()

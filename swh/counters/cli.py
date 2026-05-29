@@ -1,4 +1,4 @@
-# Copyright (C) 2021-2025  The Software Heritage developers
+# Copyright (C) 2021-2026  The Software Heritage developers
 # See the AUTHORS file at the top-level directory of this distribution
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
@@ -52,12 +52,9 @@ def counters_cli_group(ctx, config_file):
 @click.pass_context
 def journal_client(ctx, stop_after_objects, object_type, prefix):
     """Listens for new messages from the SWH Journal, and count them"""
-    import functools
-
-    from swh.counters.kafka_client import KeyOrientedJournalClient
 
     from . import get_counters
-    from .journal_client import process_journal_messages
+    from .journal_client import CountersJournalClient
 
     config = ctx.obj["config"]
     journal_cfg = config["journal"]
@@ -76,14 +73,12 @@ def journal_client(ctx, stop_after_objects, object_type, prefix):
 
     counters = get_counters(**config["counters"])
 
-    client = KeyOrientedJournalClient(**journal_cfg)
-
-    worker_fn = functools.partial(process_journal_messages, counters=counters)
+    client = CountersJournalClient(counters=counters, **journal_cfg)
 
     nb_messages = 0
     try:
-        nb_messages = client.process(worker_fn)
-        print("Processed %d messages." % nb_messages)
+        nb_messages = client.process_messages()
+        print(f"Processed {nb_messages} messages.")
     except KeyboardInterrupt:
         ctx.exit(0)
     else:
