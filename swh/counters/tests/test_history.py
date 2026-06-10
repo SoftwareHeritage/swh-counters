@@ -1,4 +1,4 @@
-# Copyright (C) 2021  The Software Heritage developers
+# Copyright (C) 2021-2026  The Software Heritage developers
 # See the AUTHORS file at the top-level directory of this distribution
 # License: GNU General Public License version 3, or any later version
 # See top-level LICENSE file for more information
@@ -43,7 +43,7 @@ def test_history_compute_url(history):
         "step": f'{TEST_HISTORY_CONFIG["interval"]}',
     }
 
-    (url, params) = history._compute_url(
+    url, params = history._compute_url(
         object=object_type,
         end=end,
     )
@@ -101,7 +101,7 @@ def test_history_get_history_relative_path_failed(history):
 def test_history__get_timestamp_history(history, requests_mock, datadir, mocker):
     object = "content"
     end = 100
-    (url, params) = history._compute_url(object, end)
+    url, params = history._compute_url(object, end)
 
     mock = mocker.patch("time.time")
     mock.return_value = end
@@ -127,7 +127,7 @@ def test_history__get_timestamp_history_request_failed(
 ):
     object = "content"
     end = 100
-    (url, params) = history._compute_url(object, end)
+    url, params = history._compute_url(object, end)
 
     mock = mocker.patch("time.time")
     mock.return_value = end
@@ -148,7 +148,7 @@ def _configure_request_mock(
     history_object, mock, datadir, objects: List[str], end: int
 ):
     for object_type in objects:
-        (url, params) = history_object._compute_url(object_type, end)
+        url, params = history_object._compute_url(object_type, end)
         request_content_file = os.path.join(datadir, f"{object_type}.json")
         with open(request_content_file, "r") as f:
             content = f.read()

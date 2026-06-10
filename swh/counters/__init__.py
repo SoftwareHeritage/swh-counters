@@ -43,7 +43,7 @@ def get_counters(cls: str, **kwargs: Dict[str, Any]) -> CountersInterface:
             % (cls, ", ".join(COUNTERS_IMPLEMENTATIONS))
         )
 
-    (module_path, class_name) = class_path.rsplit(".", 1)
+    module_path, class_name = class_path.rsplit(".", 1)
     module = importlib.import_module(module_path, package=__package__)
     Counters = getattr(module, class_name)
     return Counters(**kwargs)
@@ -70,7 +70,7 @@ def get_history(cls: str, **kwargs: Dict[str, Any]) -> HistoryInterface:
             % (cls, ", ".join(HISTORY_IMPLEMENTATIONS))
         )
 
-    (module_path, class_name) = class_path.rsplit(".", 1)
+    module_path, class_name = class_path.rsplit(".", 1)
     module = importlib.import_module(module_path, package=__package__)
     History = getattr(module, class_name)
     return History(**kwargs)
